@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+  <title>User Profile</title>
+</head>
+
+<body>
+  <h2>{{ user.username }}'s Profile</h2>
+  <img src="{{ user.profile_picture.url }}" alt="Profile Picture" width="150" height="150">
+  <p>Email: {{ user.email }}</p>
+  <p>Location Preference: {{ user.location_preference }}</p>
+  <p>Highness Status: {{ user.highness_status }}</p>
+
+  <h3>Log a New Activity</h3>
+  <form method="post" action="{% url 'log_activity' %}">
+    {% csrf_token %}
+    {{ activity_form.as_p }}
+    <button type="submit">Log Activity</button>
+  </form>
+
+  <h3>Logged Activities</h3>
+  <ul>
+    {% for activity in activities %}
+    <li>
+      <strong>{{ activity.strain_name }} ({{ activity.strain_type }})</strong>
+      <ul>
+        <li>Rating: {{ activity.rating }}</li>
+        <li>Location: {{ activity.location }}</li>
+        <li>Notes: {{ activity.notes }}</li>
+        <li>Timestamp: {{ activity.timestamp }}</li>
+      </ul>
+    </li>
+    {% endfor %}
+  </ul>
+</body>
+
+</html>

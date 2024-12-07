@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Activity Feed</title>
+</head>
+
+<body>
+  <h2>Activity Feed</h2>
+  <ul>
+    {% for activity in activities %}
+    <li>
+      <strong>{{ activity.user.username }}</strong> logged an activity:
+      <ul>
+        <li>Strain: {{ activity.strain_name }} ({{ activity.strain_type }})</li>
+        <li>Rating: {{ activity.rating }}</li>
+        <li>Location: {{ activity.location }}</li>
+        <li>Notes: {{ activity.notes }}</li>
+        <li>Timestamp: {{ activity.timestamp }}</li>
+      </ul>
+    </li>
+    {% endfor %}
+  </ul>
+</body>
+
+</html>
