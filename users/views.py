@@ -34,13 +34,11 @@ def profile(request):
             activity.user = request.user
             activity.save()
             return redirect('profile')
-        else:
-            activity_form = ActivityForm()
+    else:
+        activity_form = ActivityForm()
 
-        activities = Activity.objects.filter(user=request.user).order_by('-timestamp')
-
-        return render(request, 'users/profile.html', {'activity_form': activity_form, 'activities': activities})
-
+    activities = Activity.objects.filter(user=request.user).order_by('-timestamp')
+    return render(request, 'users/profile.html', {'activity_form': activity_form, 'activities': activities})
 
 def home(request):
     return render(request, 'users/home.html')

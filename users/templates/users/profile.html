@@ -8,13 +8,17 @@
 
 <body>
   <h2>{{ user.username }}'s Profile</h2>
+  {% if user.profile_picture %}
   <img src="{{ user.profile_picture.url }}" alt="Profile Picture" width="150" height="150">
+  {% else %}
+  <p>No profile picture available.</p>
+  {% endif %}
   <p>Email: {{ user.email }}</p>
   <p>Location Preference: {{ user.location_preference }}</p>
   <p>Highness Status: {{ user.highness_status }}</p>
 
   <h3>Log a New Activity</h3>
-  <form method="post" action="{% url 'log_activity' %}">
+  <form method="post" action="{% url 'profile' %}">
     {% csrf_token %}
     {{ activity_form.as_p }}
     <button type="submit">Log Activity</button>
