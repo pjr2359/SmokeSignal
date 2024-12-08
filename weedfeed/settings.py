@@ -27,11 +27,7 @@ DEBUG = True
 
 # settings.py
 
-ALLOWED_HOSTS = [
-    'weedfeed.azurewebsites.net',
-    '127.0.0.1',
-    'localhost',
-]
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 print("ALLOWED_HOSTS:", ALLOWED_HOSTS)
 # Application definition
 
