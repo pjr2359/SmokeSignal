@@ -28,11 +28,11 @@ DEBUG = False
 
 # settings.py
 
-#ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
-ALLOWED_HOSTS = ['*']
-#if 'weedfeed.azurewebsites.net' not in ALLOWED_HOSTS:
-#    ALLOWED_HOSTS.append('weedfeed.azurewebsites.net')
-# Application definition
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
+#ALLOWED_HOSTS = ['*']
+if 'weedfeed.azurewebsites.net' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('weedfeed.azurewebsites.net')
+#Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
