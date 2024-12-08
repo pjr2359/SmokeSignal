@@ -132,3 +132,6 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 
 LOGIN_REDIRECT_URL = '/profile/'
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
