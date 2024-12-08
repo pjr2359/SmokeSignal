@@ -87,6 +87,9 @@ DATABASES = {
         'PASSWORD': 'Conan_Stephens27',
         'HOST': 'weedfeed.postgres.database.azure.com',
         'PORT': '5432',
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
     }
 }
 
