@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-ljl#72^z$!iq^al5sh%1)c8#4xz-=l7i@%zvu#&e7h&fi2%7k-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['weedfeed.azurewebsites.net']
 
 
 # Application definition
