@@ -83,7 +83,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'weedfeed',
-        'USER': 'myadmin',
+        'USER': 'myadmin@weedfeed', 
         'PASSWORD': 'Conan_Stephens27',
         'HOST': 'weedfeed.postgres.database.azure.com',
         'PORT': '5432',
