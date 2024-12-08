@@ -24,6 +24,33 @@
     <button type="submit">Log Activity</button>
   </form>
 
+  <h3>Adjust Your Status</h3>
+  <form method="post" action="{% url 'profile' %}">
+    {% csrf_token %}
+    <label for="highness_status">Highness Status (0-10):</label>
+    <input type="range" id="highness_status" name="highness_status" min="0" max="10" value="{{ user.highness_status }}">
+    <span id="status_value">{{ user.highness_status }}</span>
+    <button type="submit">Update Status</button>
+  </form>
+
+  <h3>Your Friends</h3>
+  <ul>
+    {% for friend in friends %}
+    <li>
+      <a href="{% url 'view_profile' friend.username %}">{{ friend.username }}</a>
+    </li>
+    {% empty %}
+    <li>You have no friends yet.</li>
+    {% endfor %}
+  </ul>
+
+  <h3>Add a Friend</h3>
+  <form method="post" action="{% url 'add_friend' %}">
+    {% csrf_token %}
+    <input type="text" name="username" placeholder="Enter username">
+    <button type="submit">Add Friend</button>
+  </form>
+
   <h3>Logged Activities</h3>
   <ul>
     {% for activity in activities %}
@@ -38,6 +65,15 @@
     </li>
     {% endfor %}
   </ul>
+
+  <script>
+    const slider = document.getElementById('highness_status');
+    const output = document.getElementById('status_value');
+    output.textContent = slider.value;
+    slider.oninput = function() {
+      output.textContent = this.value;
+    }
+  </script>
 </body>
 
 </html>

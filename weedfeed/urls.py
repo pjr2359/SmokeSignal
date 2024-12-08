@@ -25,7 +25,10 @@ urlpatterns = [
     path('register/', user_views.register, name='register'),
     path('login/', auth_views.LoginView.as_view(template_name='users/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name='users/logout.html'), name='logout'),
-    path('update_highness_status/', user_views.update_highness_status, name='update_highness_status'),
+    # path('update_highness_status/', user_views.update_highness_status, name='update_highness_status'),
     path('feed/', activity_views.activity_feed, name='feed'),
     path('profile/', user_views.profile, name='profile'),
+    path('update_status/', user_views.update_status, name='update_status'),
+    path('add_friend/', user_views.add_friend, name='add_friend'),
+    path('user/<str:username>/', user_views.view_profile, name='view_profile'),
 ]
