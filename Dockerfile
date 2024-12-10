@@ -14,7 +14,7 @@ WORKDIR /app
 
 # Copy the requirements file into the container
 COPY requirements.txt /app/
-
+RUN pip install --upgrade pip
 # Install Python dependencies, including psycopg2 and Django
 RUN pip install --no-cache-dir -r requirements.txt
 
