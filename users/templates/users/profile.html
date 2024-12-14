@@ -7,52 +7,77 @@
   <title>Profile</title>
   {% load static %}
   <link href="{% static 'output.css' %}" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="https://bootswatch.com/5/morph/bootstrap.min.css">
 </head>
 
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
-  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl">
-    <h2 class="text-3xl font-bold mb-6 text-center">Your Profile</h2>
+<body class="bg-gray-100 min-h-screen d-flex align-items-center justify-content-center">
+  <div class="container">
+    <div class="row">
+      <!-- Sidebar for Friends, Friend Requests, and Add Friend -->
+      <div class="col-md-4">
+        <div class="bg-white p-4 rounded-lg shadow-lg mb-4">
+          <h3 class="h5 mb-3">Your Friends</h3>
+          <ul class="list-group mb-4">
+            {% for friend in friends %}
+            <li class="list-group-item">
+              <a href="{% url 'view_profile' friend.username %}" class="text-primary">{{ friend.username }}</a>
+            </li>
+            {% empty %}
+            <li class="list-group-item text-muted">You have no friends yet.</li>
+            {% endfor %}
+          </ul>
 
-    <h3 class="text-2xl font-semibold mb-4">Your Friends</h3>
-    <ul class="mb-6">
-      {% for friend in friends %}
-      <li class="mb-2">
-        <a href="{% url 'view_profile' friend.username %}" class="text-blue-500 hover:underline">{{ friend.username }}</a>
-      </li>
-      {% empty %}
-      <li class="text-gray-500">You have no friends yet.</li>
-      {% endfor %}
-    </ul>
+          <h3 class="h5 mb-3">Friend Requests</h3>
+          <ul class="list-group mb-4">
+            {% for request in received_requests %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span>{{ request.from_user.username }}</span>
+              <a href="{% url 'accept_friend_request' request.id %}" class="btn btn-success btn-sm">Accept</a>
+            </li>
+            {% empty %}
+            <li class="list-group-item text-muted">No friend requests.</li>
+            {% endfor %}
+          </ul>
 
-    <h3 class="text-2xl font-semibold mb-4">Add a Friend</h3>
-    <form method="post" action="{% url 'add_friend' %}" class="mb-6">
-      {% csrf_token %}
-      <input type="text" name="username" placeholder="Enter username" class="border border-gray-300 p-2 rounded-lg w-full mb-2">
-      <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 w-full">Add Friend</button>
-    </form>
+          <h3 class="h5 mb-3">Add a Friend</h3>
+          <form method="post" action="{% url 'send_friend_request' %}" class="mb-4">
+            {% csrf_token %}
+            <div class="form-group">
+              <input type="text" name="username" placeholder="Enter username" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Send Friend Request</button>
+          </form>
+        </div>
+      </div>
 
-    <h3 class="text-2xl font-semibold mb-4">Logged Activities</h3>
-    <ul>
-      {% for activity in activities %}
-      <li class="mb-4">
-        <strong class="block text-lg">{{ activity.strain_name }} ({{ activity.strain_type }})</strong>
-        <ul class="ml-4">
-          <li>Rating: {{ activity.rating }}</li>
-          <li>Location: {{ activity.location }}</li>
-          <li>Notes: {{ activity.notes }}</li>
-          <li>Timestamp: {{ activity.timestamp }}</li>
-        </ul>
-      </li>
-      {% endfor %}
-    </ul>
+      <!-- Main content for Logged Activities -->
+      <div class="col-md-8">
+        <div class="bg-white p-4 rounded-lg shadow-lg mb-4">
+          <h3 class="h5 mb-3">Logged Activities</h3>
+          <ul class="list-group mb-4" style="max-height: 400px; overflow-y: auto;">
+            {% for activity in activities %}
+            <li class="list-group-item">
+              <strong>{{ activity.strain_name }} ({{ activity.strain_type }})</strong>
+              <ul class="ml-3">
+                <li>Rating: {{ activity.rating }}</li>
+                <li>Location: {{ activity.location }}</li>
+                <li>Notes: {{ activity.notes }}</li>
+                <li>Timestamp: {{ activity.timestamp }}</li>
+              </ul>
+            </li>
+            {% endfor %}
+          </ul>
 
-    <h3 class="text-2xl font-semibold mb-4">Log a New Activity</h3>
-    <form method="post" action="{% url 'log_activity' %}" class="space-y-4">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 w-full">Log Activity</button>
-    </form>
+          <h3 class="h5 mb-3">Log a New Activity</h3>
+          <a href="{% url 'log_activity' %}" class="btn btn-success w-100 mb-4">Log Activity</a>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 
 </html>
