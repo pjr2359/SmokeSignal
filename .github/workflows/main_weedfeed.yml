@@ -22,15 +22,15 @@ jobs:
     - name: Log in to registry
       uses: docker/login-action@v2
       with:
-        registry: https://smokesignal.azurecr.io/
-        username: ${{ secrets.AzureAppService_ContainerUsername_ae2beed5d45246a5bfb7ee2fd789ee63 }}
-        password: ${{ secrets.AzureAppService_ContainerPassword_a6c197c0cf7c4747b03fb7e12abc57e8 }}
+        registry: https://index.docker.io/v1/
+        username: ${{ secrets.AzureAppService_ContainerUsername_d755926230fb49bdae8de09acf03b8de }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_e787750bd2144b6eaa49af8f1fd8592b }}
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: smokesignal.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_ae2beed5d45246a5bfb7ee2fd789ee63 }}/smokesignal:${{ github.sha }}
+        tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_d755926230fb49bdae8de09acf03b8de }}/smokesignal:${{ github.sha }}
         file: ./Dockerfile
 
   deploy:
@@ -47,5 +47,5 @@ jobs:
       with:
         app-name: 'weedfeed'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_4ec31079fd1044cabf4ba3d9ce0c0c73 }}
-        images: 'smokesignal.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_ae2beed5d45246a5bfb7ee2fd789ee63 }}/smokesignal:${{ github.sha }}'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_5cdc194c2498465ca54a5f87fdd96b29 }}
+        images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_d755926230fb49bdae8de09acf03b8de }}/smokesignal:${{ github.sha }}'
