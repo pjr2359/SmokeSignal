@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Profile</title>
   {% load static %}
-
   <link href="{% static 'output.css' %}" rel="stylesheet">
 </head>
 
@@ -46,6 +45,13 @@
       </li>
       {% endfor %}
     </ul>
+
+    <h3 class="text-2xl font-semibold mb-4">Log a New Activity</h3>
+    <form method="post" action="{% url 'log_activity' %}" class="space-y-4">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 w-full">Log Activity</button>
+    </form>
   </div>
 </body>
 

@@ -31,4 +31,5 @@ urlpatterns = [
     path('update_status/', user_views.update_status, name='update_status'),
     path('add_friend/', user_views.add_friend, name='add_friend'),
     path('user/<str:username>/', user_views.view_profile, name='view_profile'),
+    path('log_activity/', user_views.log_activity, name='log_activity'),
 ]

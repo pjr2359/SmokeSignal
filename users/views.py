@@ -83,3 +83,16 @@ def view_profile(request, username):
 
 def home(request):
     return render(request, 'users/home.html')
+
+@login_required
+def log_activity(request):
+    if request.method == 'POST':
+        form = ActivityForm(request.POST)
+        if form.is_valid():
+            activity = form.save(commit=False)
+            activity.user = request.user
+            activity.save()
+            return redirect('profile')
+    else:
+        form = ActivityForm()
+    return render(request, 'users/log_activity.html', {'form': form})
