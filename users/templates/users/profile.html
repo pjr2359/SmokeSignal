@@ -1,79 +1,50 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 
 <head>
-  <title>User Profile</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile</title>
+  <link href="{% static 'output.css' %}" rel="stylesheet">
 </head>
 
-<body>
-  <h2>{{ user.username }}'s Profile</h2>
-  {% if user.profile_picture %}
-  <img src="{{ user.profile_picture.url }}" alt="Profile Picture" width="150" height="150">
-  {% else %}
-  <p>No profile picture available.</p>
-  {% endif %}
-  <p>Email: {{ user.email }}</p>
-  <p>Location Preference: {{ user.location_preference }}</p>
-  <p>Highness Status: {{ user.highness_status }}</p>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl">
+    <h2 class="text-3xl font-bold mb-6 text-center">Your Profile</h2>
 
-  <h3>Log a New Activity</h3>
-  <form method="post" action="{% url 'profile' %}">
-    {% csrf_token %}
-    {{ activity_form.as_p }}
-    <button type="submit">Log Activity</button>
-  </form>
+    <h3 class="text-2xl font-semibold mb-4">Your Friends</h3>
+    <ul class="mb-6">
+      {% for friend in friends %}
+      <li class="mb-2">
+        <a href="{% url 'view_profile' friend.username %}" class="text-blue-500 hover:underline">{{ friend.username }}</a>
+      </li>
+      {% empty %}
+      <li class="text-gray-500">You have no friends yet.</li>
+      {% endfor %}
+    </ul>
 
-  <h3>Adjust Your Status</h3>
-  <form method="post" action="{% url 'profile' %}">
-    {% csrf_token %}
-    <label for="highness_status">Highness Status (0-10):</label>
-    <input type="range" id="highness_status" name="highness_status" min="0" max="10" value="{{ user.highness_status }}">
-    <span id="status_value">{{ user.highness_status }}</span>
-    <button type="submit">Update Status</button>
-  </form>
+    <h3 class="text-2xl font-semibold mb-4">Add a Friend</h3>
+    <form method="post" action="{% url 'add_friend' %}" class="mb-6">
+      {% csrf_token %}
+      <input type="text" name="username" placeholder="Enter username" class="border border-gray-300 p-2 rounded-lg w-full mb-2">
+      <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 w-full">Add Friend</button>
+    </form>
 
-  <h3>Your Friends</h3>
-  <ul>
-    {% for friend in friends %}
-    <li>
-      <a href="{% url 'view_profile' friend.username %}">{{ friend.username }}</a>
-    </li>
-    {% empty %}
-    <li>You have no friends yet.</li>
-    {% endfor %}
-  </ul>
-
-  <h3>Add a Friend</h3>
-  <form method="post" action="{% url 'add_friend' %}">
-    {% csrf_token %}
-    <input type="text" name="username" placeholder="Enter username">
-    <button type="submit">Add Friend</button>
-  </form>
-
-  <h3>Logged Activities</h3>
-  <ul>
-    {% for activity in activities %}
-    <li>
-      <strong>{{ activity.strain_name }} ({{ activity.strain_type }})</strong>
-      <ul>
-        <li>Rating: {{ activity.rating }}</li>
-        <li>Location: {{ activity.location }}</li>
-        <li>Notes: {{ activity.notes }}</li>
-        <li>Timestamp: {{ activity.timestamp }}</li>
-      </ul>
-    </li>
-    {% endfor %}
-  </ul>
-
-  <script>
-    const slider = document.getElementById('highness_status');
-    const output = document.getElementById('status_value');
-    output.textContent = slider.value;
-    slider.oninput = function() {
-      output.textContent = this.value;
-    }
-  </script>
+    <h3 class="text-2xl font-semibold mb-4">Logged Activities</h3>
+    <ul>
+      {% for activity in activities %}
+      <li class="mb-4">
+        <strong class="block text-lg">{{ activity.strain_name }} ({{ activity.strain_type }})</strong>
+        <ul class="ml-4">
+          <li>Rating: {{ activity.rating }}</li>
+          <li>Location: {{ activity.location }}</li>
+          <li>Notes: {{ activity.notes }}</li>
+          <li>Timestamp: {{ activity.timestamp }}</li>
+        </ul>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
 </body>
 
 </html>
