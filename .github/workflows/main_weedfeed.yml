@@ -1,7 +1,8 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
+# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
 
-name: Build and deploy container app to Azure Web App - weedfeed
+name: Build and deploy Python app to Azure Web App - weedfeed
 
 on:
   push:
@@ -11,41 +12,67 @@ on:
 
 jobs:
   build:
-    runs-on: 'ubuntu-latest'
+    runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      - name: Set up Python version
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-    - name: Log in to registry
-      uses: docker/login-action@v2
-      with:
-        registry: https://smokesignal.azurecr.io/
-        username: ${{ secrets.AzureAppService_ContainerUsername_ae2beed5d45246a5bfb7ee2fd789ee63 }}
-        password: ${{ secrets.AzureAppService_ContainerPassword_a6c197c0cf7c4747b03fb7e12abc57e8 }}
+      - name: Create and start virtual environment
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+      
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+        
+      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
-    - name: Build and push container image to registry
-      uses: docker/build-push-action@v3
-      with:
-        push: true
-        tags: smokesignal.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_ae2beed5d45246a5bfb7ee2fd789ee63 }}/smokesignal:${{ github.sha }}
-        file: ./Dockerfile
+      - name: Zip artifact for deployment
+        run: zip release.zip ./* -r
+
+      - name: Upload artifact for deployment jobs
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-app
+          path: |
+            release.zip
+            !venv/
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'production'
+      name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    permissions:
+      id-token: write #This is required for requesting the JWT
 
     steps:
-    - name: Deploy to Azure Web App
-      id: deploy-to-webapp
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: 'weedfeed'
-        slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_4ec31079fd1044cabf4ba3d9ce0c0c73 }}
-        images: 'smokesignal.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_ae2beed5d45246a5bfb7ee2fd789ee63 }}/smokesignal:${{ github.sha }}'
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: python-app
+
+      - name: Unzip artifact for deployment
+        run: unzip release.zip
+
+      
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_5559DB406B954C1CB072E5E90AD9BBA0 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_CB4B767BF9404B29A66CF931692DC748 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_A8F5C2D21A614EC3AD4EC7D69FA8D1CF }}
+
+      - name: 'Deploy to Azure Web App'
+        uses: azure/webapps-deploy@v3
+        id: deploy-to-webapp
+        with:
+          app-name: 'weedfeed'
+          slot-name: 'Production'
+          
