@@ -33,7 +33,12 @@ def update_status(request):
 def profile(request):
     if request.method == 'POST':
         # Update highness status
+        print("The request post is: " + request.POST )  # Debugging 
         highness_status = request.POST.get('highness_status')
+        if highness_status is not None:
+            print("The highness status is: " + highness_status)  # Debugging
+        else:
+            print("The highness status is None")
         if highness_status is not None:
             request.user.highness_status = highness_status
             request.user.save()
