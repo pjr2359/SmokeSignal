@@ -1,5 +1,17 @@
 # Virtual environment
+venv/
 .venv/
+
+# Tailwind CSS build output
+dist/
+build/
+
+# Log files
+*.log
+
+# Node modules
+node_modules/
+
 
 # Python cache files
 __pycache__/
