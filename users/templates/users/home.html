@@ -1,13 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Home</title>
+  <link rel="stylesheet" type="text/css" href="https://bootswatch.com/5/morph/bootstrap.min.css">
+  {% load static %}
+  <link href="{% static 'output.css' %}" rel="stylesheet">
 </head>
 
-<body>
-  <h2>Welcome to WeedFeed</h2>
-  <p><a href="{% url 'register' %}">Register</a> or <a href="{% url 'login' %}">Login</a></p>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white p-8 rounded-lg shadow-lg text-center">
+    <h2 class="text-4xl font-bold mb-6">Welcome to SmokeSignal</h2>
+    <p class="text-lg mb-4">Join our community to share and explore activities.</p>
+    <div>
+      <a href="{% url 'register' %}" class="btn btn-primary mr-2">Register</a>
+      <a href="{% url 'login' %}" class="btn btn-success">Login</a>
+    </div>
+  </div>
 </body>
 
 </html>

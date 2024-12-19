@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log Activity</title>
+  {% load static %}
+  <link href="{% static 'output.css' %}" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+    <h2 class="text-3xl font-bold mb-6 text-center">Log a New Activity</h2>
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 w-full">Log Activity</button>
+    </form>
+  </div>
+</body>
+
+</html>

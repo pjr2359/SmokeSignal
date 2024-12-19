@@ -20,19 +20,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ljl#72^z$!iq^al5sh%1)c8#4xz-=l7i@%zvu#&e7h&fi2%7k-'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+SECRET_KEY = os.getenv('SECRET_KEY')
+
+DEBUG = True
 
 # settings.py
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
-#ALLOWED_HOSTS = ['*']
+
 if 'weedfeed.azurewebsites.net' not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append('weedfeed.azurewebsites.net')
-#Application definition
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -84,7 +83,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'weedfeed',
         'USER': 'myadmin@weedfeed', 
-        'PASSWORD': 'Conan_Stephens27',
+        'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': 'weedfeed.postgres.database.azure.com',
         'PORT': '5432',
         'OPTIONS': {
@@ -92,7 +91,9 @@ DATABASES = {
         },
     }
 }
-
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
