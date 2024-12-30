@@ -35,6 +35,13 @@ ALLOWED_HOSTS = [
     '127.0.0.1'
 ]
 
+# Enable HTTPS redirect
+SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Session security
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 INSTALLED_APPS = [
     'django.contrib.admin',
