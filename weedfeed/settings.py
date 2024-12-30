@@ -32,16 +32,18 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = [
     'weedfeed.azurewebsites.net',
     'localhost',
-    '127.0.0.1'
+    '127.0.0.1',
+    '169.254.129.4',  # Add the internal Azure IP
+    '*',  # Temporarily allow all hosts for testing
 ]
 
-# Enable HTTPS redirect
-SECURE_SSL_REDIRECT = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# For production, you should remove '*' and only include specific domains
 
-# Session security
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+
+# SECURE_SSL_REDIRECT = True
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
 
 INSTALLED_APPS = [
     'django.contrib.admin',
