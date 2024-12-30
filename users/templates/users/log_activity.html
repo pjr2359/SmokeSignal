@@ -7,17 +7,149 @@
   <title>Log Activity</title>
   {% load static %}
   <link href="{% static 'output.css' %}" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+  {% load static %}
+  <link href="{% static 'output.css' %}" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="https://bootswatch.com/5/morph/bootstrap.min.css">
 </head>
 
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-    <h2 class="text-3xl font-bold mb-6 text-center">Log a New Activity</h2>
-    <form method="post" class="space-y-4">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 w-full">Log Activity</button>
-    </form>
+<body class="bg-gray-100 min-h-screen">
+  <div class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+      <h2 class="text-3xl font-bold mb-6 text-center">Log a New Activity</h2>
+      <form method="post" class="space-y-4">
+        {% csrf_token %}
+        {{ form.latitude }}
+        {{ form.longitude }}
+        <div class="mb-4">
+          <label>Location</label>
+          <!-- Add this button -->
+          <button type="button" onclick="getCurrentLocation()"
+            class="border-2 border-black text-black text-lg py-2 px-4 rounded-lg hover:bg-earthy-blue hover:text-white hover:border-white w-full mb-2">
+            Use Current Location
+          </button>
+          <div id="map" style="height: 300px;" class="mb-2"></div>
+          {{ form.location }}
+        </div>
+        {{ form.strain_name.label_tag }}
+        {{ form.strain_name }}
+        {{ form.strain_type.label_tag }}
+        {{ form.strain_type }}
+        {{ form.rating.label_tag }}
+        {{ form.rating }}
+        {{ form.notes.label_tag }}
+        {{ form.notes }}
+        <button type="submit"
+          class="bg-green-500 text-black py-2 px-4 rounded-lg hover:bg-green-600 w-full font-semibold">
+          Log Activity
+        </button>
+      </form>
+    </div>
   </div>
+
+  <script>
+    var map = L.map('map').setView([0, 0], 2);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    //  geocoding control
+    const geocoder = L.Control.geocoder({
+      defaultMarkGeocode: false
+    })
+      .on('markgeocode', function (e) {
+        const latlng = e.geocode.center;
+        if (marker) {
+          map.removeLayer(marker);
+        }
+        marker = L.marker(latlng).addTo(map);
+        document.getElementById('id_latitude').value = latlng.lat;
+        document.getElementById('id_longitude').value = latlng.lng;
+        document.getElementById('id_location').value = e.geocode.name;
+        map.setView(latlng, 13);
+      })
+      .addTo(map);
+
+    var marker;
+    map.on('click', function (e) {
+      if (marker) {
+        map.removeLayer(marker);
+      }
+      marker = L.marker(e.latlng).addTo(map);
+      document.getElementById('id_latitude').value = e.latlng.lat;
+      document.getElementById('id_longitude').value = e.latlng.lng;
+    });
+
+    // Try to get user's location
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(function (position) {
+        map.setView([position.coords.latitude, position.coords.longitude], 13);
+      });
+    }
+
+    function getCurrentLocation() {
+      // Check if permissions are granted
+      navigator.permissions.query({ name: 'geolocation' })
+        .then(function (permissionStatus) {
+          if (permissionStatus.state === 'denied') {
+            // Show instructions to enable location
+            alert("Please enable location access:\n\n" +
+              "1. Click the lock/info icon in your browser's address bar\n" +
+              "2. Click 'Site Settings'\n" +
+              "3. Change Location access to 'Allow'\n" +
+              "4. Refresh the page");
+          } else {
+            // Request location with a more user-friendly prompt
+            navigator.geolocation.getCurrentPosition(
+              success,
+              error,
+              {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+              }
+            );
+          }
+        });
+    }
+
+    function success(position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+
+      // Update map and marker
+      map.setView([lat, lon], 13);
+      if (marker) {
+        map.removeLayer(marker);
+      }
+      marker = L.marker([lat, lon]).addTo(map);
+
+      // Update form fields
+      document.getElementById('id_latitude').value = lat;
+      document.getElementById('id_longitude').value = lon;
+
+      // Reverse geocode
+      geocoder.reverse([lat, lon], map.getZoom(), function (results) {
+        if (results.length > 0) {
+          document.getElementById('id_location').value = results[0].name;
+        }
+      });
+    }
+
+    function error(err) {
+      if (err.code === 1) {
+        // Permission denied
+        alert("Please allow location access when prompted by your browser.");
+      } else if (err.code === 2) {
+        alert("Location not available. Please try again.");
+      } else if (err.code === 3) {
+        alert("Location request timed out. Please try again.");
+      }
+    }
+  </script>
 </body>
 
 </html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Friend Activities Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  {% load static %}
+  <link href="{% static 'output.css' %}" rel="stylesheet">
+  <style>
+    #map {
+      height: 80vh;
+      width: 100%;
+      border-radius: 0.5rem;
+    }
+
+    .activity-popup {
+      max-width: 300px;
+    }
+
+    .time-badge {
+      padding: 4px 8px;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      margin-top: 4px;
+    }
+
+    .recent {
+      background-color: #22c55e;
+      color: white;
+    }
+
+    .hour {
+      background-color: #eab308;
+      color: white;
+    }
+
+    .old {
+      background-color: #ef4444;
+      color: white;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+  <div class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+      <h1 class="text-2xl font-bold mb-4">Friend Activities Map</h1>
+      <div id="map" class="rounded-lg"></div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const map = L.map('map').setView([43.0, -76.0], 7); // Centered on NY state
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      function getTimeBadgeClass(timestamp) {
+        const minutes = Math.floor((Date.now() - new Date(timestamp)) / 60000);
+        if (minutes < 30) return 'recent';
+        if (minutes < 60) return 'hour';
+        return 'old';
+      }
+
+      // Add loading indicator
+      const loadingDiv = document.createElement('div');
+      loadingDiv.innerHTML = 'Loading friend activities...';
+      loadingDiv.className = 'text-center p-4';
+      document.querySelector('.container').appendChild(loadingDiv);
+
+      fetch('/api/friend-activities/')
+        .then(response => response.json())
+        .then(activities => {
+          loadingDiv.remove();
+          console.log('Received activities:', activities); // Debug log
+
+          if (activities.length === 0) {
+            const noActivitiesDiv = document.createElement('div');
+            noActivitiesDiv.innerHTML = 'No friend activities found';
+            noActivitiesDiv.className = 'text-center p-4';
+            document.querySelector('.container').appendChild(noActivitiesDiv);
+            return;
+          }
+
+          const bounds = L.latLngBounds();
+          activities.forEach(activity => {
+            if (activity.latitude && activity.longitude) {
+              const marker = L.marker([activity.latitude, activity.longitude])
+                .bindPopup(`
+                                    <div class="activity-popup">
+                                        <h3 class="font-bold">${activity.user}'s Activity</h3>
+                                        <p>Strain: ${activity.strain_name} (${activity.strain_type})</p>
+                                        <p>Rating: ${activity.rating}/10</p>
+                                        <p>Location: ${activity.location}</p>
+                                        <p>Time: ${new Date(activity.timestamp).toLocaleString()}</p>
+                                    </div>
+                                `)
+                .addTo(map);
+
+              bounds.extend([activity.latitude, activity.longitude]);
+            }
+          });
+
+          if (bounds.isValid()) {
+            map.fitBounds(bounds);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching activities:', error);
+          loadingDiv.innerHTML = 'Error loading friend activities';
+        });
+    });
+  </script>
+</body>
+
+</html>

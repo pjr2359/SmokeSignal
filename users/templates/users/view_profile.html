@@ -1,33 +1,97 @@
-<!-- users/templates/users/view_profile.html -->
+{% load static %}
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>{{ profile_user.username }}'s Profile</title>
-</head>
-<body>
-  <h2>{{ profile_user.username }}'s Profile</h2>
-  {% if profile_user.profile_picture %}
-  <img src="{{ profile_user.profile_picture.url }}" alt="Profile Picture" width="150" height="150">
-  {% else %}
-  <p>No profile picture available.</p>
-  {% endif %}
-  <p>Email: {{ profile_user.email }}</p>
-  <p>Location Preference: {{ profile_user.location_preference }}</p>
-  <p>Highness Status: {{ profile_user.highness_status }}</p>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    function requestLocation() {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
 
-  <h3>Logged Activities</h3>
-  <ul>
-    {% for activity in activities %}
-    <li>
-      <strong>{{ activity.strain_name }} ({{ activity.strain_type }})</strong>
-      <ul>
-        <li>Rating: {{ activity.rating }}</li>
-        <li>Location: {{ activity.location }}</li>
-        <li>Notes: {{ activity.notes }}</li>
-        <li>Timestamp: {{ activity.timestamp }}</li>
-      </ul>
-    </li>
-    {% endfor %}
-  </ul>
+          // Update display or form
+          document.getElementById('location-display').innerHTML =
+            `📍 Location: ${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+
+          // Optional: Update hidden form fields
+          document.getElementById('latitude').value = lat;
+          document.getElementById('longitude').value = lon;
+        }, function (error) {
+          console.error("Error getting location:", error);
+          alert("Unable to get location. Please enable location services.");
+        });
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+  <div class="container mx-auto px-4 py-8">
+    <!-- User Profile Header -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+      <div class="flex items-center space-x-4">
+        {% if profile_user.profile_picture %}
+        <img src="{{ profile_user.profile_picture.url }}" alt="Profile Picture"
+          class="w-24 h-24 rounded-full object-cover">
+        {% else %}
+        <div class="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center">
+          <span class="text-2xl text-gray-600">{{ profile_user.username|first|upper }}</span>
+        </div>
+        {% endif %}
+        <div>
+          <h1 class="text-2xl font-bold">{{ profile_user.username }}</h1>
+          {% if profile_user.location_preference %}
+          <p class="text-gray-600">📍 {{ profile_user.location_preference }}</p>
+          {% endif %}
+          <p class="text-gray-600">Current Highness: {{ profile_user.highness_status }}/10</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activities Feed -->
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <h2 class="text-xl font-bold mb-4">Recent Activities</h2>
+      {% if activities %}
+      <div class="space-y-4">
+        {% for activity in activities %}
+        <div class="border-b pb-4 last:border-b-0">
+          <div class="flex justify-between items-start">
+            <div>
+              <h3 class="font-semibold">{{ activity.strain_name }}</h3>
+              <p class="text-sm text-gray-600">Type: {{ activity.strain_type }}</p>
+              <p class="text-sm text-gray-600">Rating: {{ activity.rating }}/10</p>
+              {% if activity.location %}
+              <p class="text-sm text-gray-600">Location: {{ activity.location }}</p>
+              {% endif %}
+              {% if activity.notes %}
+              <p class="text-sm text-gray-700 mt-2">{{ activity.notes }}</p>
+              {% endif %}
+            </div>
+            <span class="text-sm text-gray-500">
+              {{ activity.timestamp|date:"M d, Y" }}
+            </span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="text-gray-600">No activities logged yet.</p>
+      {% endif %}
+    </div>
+
+    <!-- Add this where you want the location button -->
+    <div class="mt-4">
+      <button onclick="requestLocation()" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+        Get Current Location
+      </button>
+      <div id="location-display" class="mt-2 text-gray-600"></div>
+    </div>
+  </div>
 </body>
+
 </html>

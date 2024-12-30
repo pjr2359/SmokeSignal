@@ -40,12 +40,13 @@
           </ul>
 
           <h3 class="h5 mb-3">Add a Friend</h3>
-          <form method="post" action="{% url 'send_friend_request' %}" class="mb-4">
+          <form method="post" class="mb-4">
             {% csrf_token %}
             <div class="form-group">
-              <input type="text" name="username" placeholder="Enter username" class="form-control">
+              <input type="text" id="friend_username" name="username" placeholder="Enter username" class="form-control">
             </div>
-            <button type="submit" class="btn btn-primary w-100">Send Friend Request</button>
+            <button type="button" onclick="sendFriendRequest()" class="btn btn-primary w-100">Send Friend
+              Request</button>
           </form>
         </div>
       </div>
@@ -70,6 +71,8 @@
 
           <h3 class="h5 mb-3">Log a New Activity</h3>
           <a href="{% url 'log_activity' %}" class="btn btn-success w-100 mb-4">Log Activity</a>
+          <!-- Add this button in your profile template -->
+          <a href="{% url 'activity_map' %}" class="btn btn-primary mb-4">View Activity Map</a>
         </div>
       </div>
     </div>
@@ -78,6 +81,14 @@
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+    function sendFriendRequest() {
+      const username = document.getElementById('friend_username').value;
+      if (username) {
+        window.location.href = `/send_friend_request/${username}/`;
+      }
+    }
+  </script>
 </body>
 
 </html>

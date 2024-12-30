@@ -32,6 +32,9 @@ urlpatterns = [
     path('add_friend/', user_views.add_friend, name='add_friend'),
     path('user/<str:username>/', user_views.view_profile, name='view_profile'),
     path('send_friend_request/', user_views.send_friend_request, name='send_friend_request'),
+    path('send_friend_request/<str:username>/', user_views.send_friend_request, name='send_friend_request'),
     path('accept_friend_request/<int:request_id>/', user_views.accept_friend_request, name='accept_friend_request'),
     path('log_activity/', user_views.log_activity, name='log_activity'),
+    path('activity-map/', user_views.activity_map, name='activity_map'),
+    path('api/friend-activities/', user_views.friend_activities_api, name='friend_activities_api'),
 ]

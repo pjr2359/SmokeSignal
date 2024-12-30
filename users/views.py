@@ -7,6 +7,10 @@ from activities.models import Activity
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from .models import CustomUser, FriendRequest
+from django.http import JsonResponse
+from django.utils import timezone
+from datetime import timedelta
+from django.db.models import Q
 
 User = get_user_model()
 
@@ -91,7 +95,8 @@ def view_profile(request, username):
         activities = Activity.objects.filter(user=profile_user).order_by('-timestamp')
         return render(request, 'users/view_profile.html', {
             'profile_user': profile_user,
-            'activities': activities
+            'activities': activities,
+            'request_location': True  # Flag to enable location request
         })
     except User.DoesNotExist:
         messages.error(request, 'User not found.')
@@ -115,13 +120,17 @@ def log_activity(request):
 
 @login_required
 def send_friend_request(request, username):
+    if request.user.username == username:
+        messages.error(request, "You cannot send a friend request to yourself.")
+        return redirect('profile')
+        
     try:
         to_user = CustomUser.objects.get(username=username)
-        friend_request, created = FriendRequest.objects.get_or_create(from_user=request.user, to_user=to_user)
-        if created:
-            messages.success(request, f'Friend request sent to {to_user.username}')
-        else:
+        if FriendRequest.objects.filter(from_user=request.user, to_user=to_user, accepted=False).exists():
             messages.info(request, f'Friend request already sent to {to_user.username}')
+        else:
+            FriendRequest.objects.create(from_user=request.user, to_user=to_user)
+            messages.success(request, f'Friend request sent to {to_user.username}')
     except CustomUser.DoesNotExist:
         messages.error(request, 'User not found.')
     return redirect('profile')
@@ -139,3 +148,37 @@ def accept_friend_request(request, request_id):
     except FriendRequest.DoesNotExist:
         messages.error(request, 'Friend request not found.')
     return redirect('profile')
+
+@login_required
+def activity_map(request):
+    return render(request, 'users/activity_map.html')
+
+@login_required
+def friend_activities_api(request):
+    friends = CustomUser.objects.filter(
+        Q(sent_friend_requests__to_user=request.user, sent_friend_requests__accepted=True) |
+        Q(received_friend_requests__from_user=request.user, received_friend_requests__accepted=True)
+    ).distinct()
+    
+    activities = Activity.objects.filter(
+        user__in=friends,
+        latitude__isnull=False,
+        longitude__isnull=False
+    ).order_by('-timestamp')
+    
+    print(f"Found {activities.count()} activities for user {request.user.username}")
+    print(f"Friends: {[f.username for f in friends]}")
+    
+    data = [{
+        'user': activity.user.username,
+        'strain_name': activity.strain_name,
+        'strain_type': activity.strain_type,
+        'rating': activity.rating,
+        'location': activity.location,
+        'latitude': float(activity.latitude),
+        'longitude': float(activity.longitude),
+        'timestamp': activity.timestamp.isoformat()
+    } for activity in activities]
+    
+    print(f"Returning {len(data)} activities")
+    return JsonResponse(data, safe=False)
