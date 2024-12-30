@@ -25,14 +25,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-DEBUG = False
+# Set DEBUG based on environment
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-# settings.py
-
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
-
-if 'weedfeed.azurewebsites.net' not in ALLOWED_HOSTS:
-    ALLOWED_HOSTS.append('weedfeed.azurewebsites.net')
+# Update ALLOWED_HOSTS to ensure Azure domain is included
+ALLOWED_HOSTS = [
+    'weedfeed.azurewebsites.net',
+    'localhost',
+    '127.0.0.1'
+]
 
 
 INSTALLED_APPS = [
@@ -80,27 +81,20 @@ WSGI_APPLICATION = 'weedfeed.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-if DEBUG:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+# Database configuration for Azure
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME', 'weedfeed'),
+        'USER': os.getenv('DB_USER', 'myadmin@weedfeed'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST', 'weedfeed.postgres.database.azure.com'),
+        'PORT': os.getenv('DB_PORT', '5432'),
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('DB_NAME'),
-            'USER': os.getenv('DB_USER'),
-            'PASSWORD': os.getenv('DB_PASSWORD'),
-            'HOST': os.getenv('DB_HOST'),
-            'PORT': os.getenv('DB_PORT'),
-            'OPTIONS': {
-                'sslmode': 'require',
-            },
-        }
-    }
+}
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
