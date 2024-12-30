@@ -34,11 +34,11 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '169.254.129.4',
-    '169.254.129.2',  # Add the internal Azure IP
-    '*',  # Temporarily allow all hosts for testing
+    '169.254.129.2',
+    '169.254.129.7',  # Add this internal Azure IP
+    '*',  # Consider removing this in production
 ]
 
-# For production, you should remove '*' and only include specific domains
 
 
 # SECURE_SSL_REDIRECT = True
