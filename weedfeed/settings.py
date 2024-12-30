@@ -33,7 +33,8 @@ ALLOWED_HOSTS = [
     'weedfeed.azurewebsites.net',
     'localhost',
     '127.0.0.1',
-    '169.254.129.4',  # Add the internal Azure IP
+    '169.254.129.4',
+    '169.254.129.2',  # Add the internal Azure IP
     '*',  # Temporarily allow all hosts for testing
 ]
 
