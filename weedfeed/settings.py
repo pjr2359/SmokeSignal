@@ -25,18 +25,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-# Set DEBUG based on environment
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+DEBUG = True
 
-# Update ALLOWED_HOSTS to ensure Azure domain is included
 ALLOWED_HOSTS = [
-    'weedfeed.azurewebsites.net',
+    'pjr99.pythonanywhere.com',
     'localhost',
     '127.0.0.1',
     '169.254.129.4',
     '169.254.129.2',
-    '169.254.129.7',  # Add this internal Azure IP
-    '*',  # Consider removing this in production
+    '169.254.129.7',  
+    '*', 
 ]
 
 
@@ -88,6 +86,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'weedfeed.wsgi.application'
 
 
+
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
@@ -95,10 +94,10 @@ WSGI_APPLICATION = 'weedfeed.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'weedfeed'),
-        'USER': os.getenv('DB_USER', 'myadmin@weedfeed'),
+        'NAME': os.getenv('DB_NAME', 'pjr99$default'),
+        'USER': os.getenv('DB_USER', 'pjr99'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST', 'weedfeed.postgres.database.azure.com'),
+        'HOST': os.getenv('DB_HOST', 'pjr99.mysql.pythonanywhere-services.com'),
         'PORT': os.getenv('DB_PORT', '5432'),
         'OPTIONS': {
             'sslmode': 'require',
