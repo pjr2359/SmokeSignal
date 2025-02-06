@@ -33,8 +33,9 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     '169.254.129.4',
     '169.254.129.2',
-    '169.254.129.7',  
-    '*', 
+    '169.254.129.7',
+    '*',
+    '10.0.0.19',
 ]
 
 
@@ -93,14 +94,14 @@ WSGI_APPLICATION = 'weedfeed.wsgi.application'
 # Database configuration for Azure
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'pjr99$default'),
-        'USER': os.getenv('DB_USER', 'pjr99'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv( 'DB_NAME'),
+        'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': os.getenv('DB_HOST', 'pjr99.mysql.pythonanywhere-services.com'),
-        'PORT': os.getenv('DB_PORT', '5432'),
+        'PORT': os.getenv('DB_PORT'),
         'OPTIONS': {
-            'sslmode': 'require',
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
         },
     }
 }
