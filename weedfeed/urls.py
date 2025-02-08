@@ -37,4 +37,5 @@ urlpatterns = [
     path('log_activity/', user_views.log_activity, name='log_activity'),
     path('activity-map/', user_views.activity_map, name='activity_map'),
     path('api/friend-activities/', user_views.friend_activities_api, name='friend_activities_api'),
+    path('main_feed/', activity_views.main_feed, name='main_feed'),
 ]

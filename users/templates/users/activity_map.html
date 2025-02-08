@@ -1,23 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Friend Activities Map</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   {% load static %}
-  <link href="{% static 'output.css' %}" rel="stylesheet">
+  <!-- Tailwind CSS with custom cannabis colors -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cannabis: {
+              100: '#e8f5e9',
+              200: '#c8e6c9',
+              300: '#a5d6a7',
+              400: '#81c784',
+              500: '#66bb6a',
+              600: '#4caf50',
+              700: '#43a047',
+              800: '#388e3c',
+              900: '#2e7d32'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Custom Styles -->
   <style>
+    /* Map container styling */
     #map {
       height: 80vh;
       width: 100%;
       border-radius: 0.5rem;
     }
 
+    /* Popup content styling */
     .activity-popup {
       max-width: 300px;
     }
 
+    /* Badge styling for activity timestamps */
     .time-badge {
       padding: 4px 8px;
       border-radius: 9999px;
@@ -42,22 +70,69 @@
   </style>
 </head>
 
-<body class="bg-gray-100 min-h-screen">
-  <div class="container mx-auto px-4 py-8">
-    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-      <h1 class="text-2xl font-bold mb-4">Friend Activities Map</h1>
-      <div id="map" class="rounded-lg"></div>
+<body class="bg-gradient-to-br from-cannabis-100 to-cannabis-200 min-h-screen">
+  <div class="flex">
+    <!-- Persistent Sidebar -->
+    <div class="w-64 bg-white/90 backdrop-blur-sm min-h-screen p-4 shadow-lg">
+      <div class="mb-8">
+        <h2 class="text-cannabis-800 text-xl font-bold mb-4">Smoke Signal</h2>
+        <div class="space-y-2">
+          <!-- Profile -->
+          <a href="{% url 'profile' %}"
+            class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M5.121 17.804A11.956 11.956 0 0012 20c2.282 0 4.403-.64 6.121-1.735M12 14c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z">
+              </path>
+            </svg>
+            <span>Profile</span>
+          </a>
+          <!-- Activity Feed -->
+          <a href="{% url 'main_feed' %}"
+            class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2">
+              </path>
+            </svg>
+            <span>Activity Feed</span>
+          </a>
+          <!-- Map View (active) -->
+          <a href="{% url 'activity_map' %}"
+            class="flex items-center space-x-3 p-3 rounded-lg bg-cannabis-200 text-cannabis-800">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9 20l-5.447-2.724A2 2 0 013 15.382V6.618a2 2 0 011.553-1.894L9 3l6-1.5 5.447 2.724A2 2 0 0121 6.618v8.764a2 2 0 01-1.553 1.894L15 19l-6 1.5z">
+              </path>
+            </svg>
+            <span>Map View</span>
+          </a>
+          <!-- You can add additional sidebar links here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 p-8">
+      <div class="max-w-4xl mx-auto bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl p-6">
+        <h1 class="text-2xl font-bold text-cannabis-800 mb-4">Friend Activities Map</h1>
+        <div id="map" class="rounded-lg"></div>
+      </div>
     </div>
   </div>
 
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      const map = L.map('map').setView([43.0, -76.0], 7); // Centered on NY state
+      // Initialize the map centered on New York state
+      const map = L.map('map').setView([43.0, -76.0], 7);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
       }).addTo(map);
 
+      // Function to return a class for the time badge based on the activity timestamp
       function getTimeBadgeClass(timestamp) {
         const minutes = Math.floor((Date.now() - new Date(timestamp)) / 60000);
         if (minutes < 30) return 'recent';
@@ -65,12 +140,15 @@
         return 'old';
       }
 
-      // Add loading indicator
+      // Create a loading indicator
       const loadingDiv = document.createElement('div');
       loadingDiv.innerHTML = 'Loading friend activities...';
       loadingDiv.className = 'text-center p-4';
-      document.querySelector('.container').appendChild(loadingDiv);
+      // Append the loading indicator to the main content container
+      const mainContent = document.querySelector('.max-w-4xl');
+      mainContent.appendChild(loadingDiv);
 
+      // Fetch friend activities from the API endpoint
       fetch('/api/friend-activities/')
         .then(response => response.json())
         .then(activities => {
@@ -81,25 +159,24 @@
             const noActivitiesDiv = document.createElement('div');
             noActivitiesDiv.innerHTML = 'No friend activities found';
             noActivitiesDiv.className = 'text-center p-4';
-            document.querySelector('.container').appendChild(noActivitiesDiv);
+            mainContent.appendChild(noActivitiesDiv);
             return;
           }
 
           const bounds = L.latLngBounds();
           activities.forEach(activity => {
             if (activity.latitude && activity.longitude) {
-              const marker = L.marker([activity.latitude, activity.longitude])
+              L.marker([activity.latitude, activity.longitude])
                 .bindPopup(`
-                                    <div class="activity-popup">
-                                        <h3 class="font-bold">${activity.user}'s Activity</h3>
-                                        <p>Strain: ${activity.strain_name} (${activity.strain_type})</p>
-                                        <p>Rating: ${activity.rating}/10</p>
-                                        <p>Location: ${activity.location}</p>
-                                        <p>Time: ${new Date(activity.timestamp).toLocaleString()}</p>
-                                    </div>
-                                `)
+                  <div class="activity-popup">
+                    <h3 class="font-bold">${activity.user}'s Activity</h3>
+                    <p>Strain: ${activity.strain_name} (${activity.strain_type})</p>
+                    <p>Rating: ${activity.rating}/10</p>
+                    <p>Location: ${activity.location}</p>
+                    <p>Time: ${new Date(activity.timestamp).toLocaleString()}</p>
+                  </div>
+                `)
                 .addTo(map);
-
               bounds.extend([activity.latitude, activity.longitude]);
             }
           });
