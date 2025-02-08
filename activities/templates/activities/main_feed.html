@@ -4,8 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Profile</title>
-  {% load static %}
+  <title>Smoke Signal - Activity Feed</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -32,14 +31,14 @@
 
 <body class="bg-gradient-to-br from-cannabis-100 to-cannabis-200 min-h-screen">
   <div class="flex">
-    <!-- Persistent Navigation Sidebar -->
+    <!-- Persistent Sidebar -->
     <div class="w-64 bg-white/90 backdrop-blur-sm min-h-screen p-4 shadow-lg">
       <div class="mb-8">
-        <h2 class="text-cannabis-800 text-xl font-bold mb-4">Smoke Singal</h2>
+        <h2 class="text-cannabis-800 text-xl font-bold mb-4">Smoke Signal</h2>
         <div class="space-y-2">
-          <!-- Profile -->
+          <!-- Profile Section -->
           <a href="{% url 'profile' %}"
-            class="flex items-center space-x-3 p-3 rounded-lg bg-cannabis-200 text-cannabis-800">
+            class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M5.121 17.804A11.956 11.956 0 0012 20c2.282 0 4.403-.64 6.121-1.735M12 14c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z">
@@ -47,9 +46,9 @@
             </svg>
             <span>Profile</span>
           </a>
-          <!-- Feed -->
+          <!-- Activity Feed -->
           <a href="{% url 'main_feed' %}"
-            class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
+            class="flex items-center space-x-3 p-3 rounded-lg bg-cannabis-200 text-cannabis-800">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2">
@@ -98,98 +97,78 @@
       </div>
     </div>
 
-    <!-- Main Content Area -->
-    <div class="flex-1 p-6">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Profile Sidebar: Friends, Friend Requests, and Add Friend -->
-        <div class="md:col-span-1">
-          <div class="bg-white/90 backdrop-blur-sm p-6 rounded-lg shadow-lg">
-            <!-- Your Friends -->
-            <h3 class="text-lg font-semibold text-cannabis-800 mb-4">Your Friends</h3>
-            <ul class="space-y-2 mb-6">
-              {% for friend in friends %}
-              <li class="p-2 border border-cannabis-200 rounded">
-                <a href="{% url 'view_profile' friend.username %}" class="text-cannabis-600 hover:underline">
-                  {{ friend.username }}
-                </a>
-              </li>
-              {% empty %}
-              <li class="text-gray-500">You have no friends yet.</li>
+    <!-- Main Content Area: Activity Feed and News Section -->
+    <div class="flex-1 p-8">
+      <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Activity Feed Column (2/3 of width) -->
+        <div class="md:col-span-2">
+          <div class="bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl p-6">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-6">
+              <h1 class="text-2xl font-bold text-cannabis-800">Activity Feed</h1>
+              <a href="{% url 'log_activity' %}"
+                class="bg-gradient-to-r from-cannabis-600 to-cannabis-700 hover:from-cannabis-700 hover:to-cannabis-800 text-white px-6 py-3 rounded-xl transition-colors shadow-md hover:shadow-lg">
+                Log Activity
+              </a>
+            </div>
+            <!-- Feed -->
+            <div class="space-y-4">
+              {% for activity in activities %}
+              <div
+                class="p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow border border-cannabis-200">
+                <p class="text-sm font-semibold text-cannabis-800">
+                  {{ activity.user.username }}
+                  <span class="text-cannabis-600">• {{ activity.location }}</span>
+                </p>
+                <p class="text-gray-700 mt-2">{{ activity.notes }}</p>
+                <div class="flex items-center justify-between text-xs mt-3 text-cannabis-600">
+                  <span class="flex items-center">
+                    🌿 {{ activity.strain_name }}
+                  </span>
+                  <span>{{ activity.timestamp|timesince }} ago</span>
+                </div>
+              </div>
               {% endfor %}
-            </ul>
-
-            <!-- Friend Requests -->
-            <h3 class="text-lg font-semibold text-cannabis-800 mb-4">Friend Requests</h3>
-            <ul class="space-y-2 mb-6">
-              {% for request in received_requests %}
-              <li class="flex justify-between items-center p-2 border border-cannabis-200 rounded">
-                <span>{{ request.from_user.username }}</span>
-                <a href="{% url 'accept_friend_request' request.id %}"
-                  class="bg-cannabis-500 hover:bg-cannabis-600 text-white text-sm px-3 py-1 rounded">
-                  Accept
-                </a>
-              </li>
-              {% empty %}
-              <li class="text-gray-500">No friend requests.</li>
-              {% endfor %}
-            </ul>
-
-            <!-- Add a Friend -->
-            <h3 class="text-lg font-semibold text-cannabis-800 mb-4">Add a Friend</h3>
-            <form method="post" class="space-y-4">
-              {% csrf_token %}
-              <input type="text" id="friend_username" name="username" placeholder="Enter username"
-                class="w-full p-2 border border-cannabis-200 rounded focus:outline-none focus:border-cannabis-500">
-              <button type="button" onclick="sendFriendRequest()"
-                class="w-full bg-cannabis-500 hover:bg-cannabis-600 text-white p-2 rounded">
-                Send Friend Request
-              </button>
-            </form>
+            </div>
           </div>
         </div>
 
-        <!-- Main Profile Content: Logged Activities -->
-        <div class="md:col-span-2">
-          <div class="bg-white/90 backdrop-blur-sm p-6 rounded-lg shadow-lg">
-            <h3 class="text-lg font-semibold text-cannabis-800 mb-4">Logged Activities</h3>
-            <ul class="space-y-4 mb-6 max-h-96 overflow-y-auto">
-              {% for activity in activities %}
-              <li class="p-4 border border-cannabis-200 rounded">
-                <strong class="text-cannabis-700">{{ activity.strain_name }} ({{ activity.strain_type }})</strong>
-                <ul class="mt-2 ml-4 list-disc text-gray-700">
-                  <li>Rating: {{ activity.rating }}</li>
-                  <li>Location: {{ activity.location }}</li>
-                  <li>Notes: {{ activity.notes }}</li>
-                  <li>Timestamp: {{ activity.timestamp }}</li>
-                </ul>
-              </li>
-              {% endfor %}
-            </ul>
-
+        <!-- News Section Column (1/3 of width) -->
+        <div class="md:col-span-1">
+          <div class="bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl p-6">
+            <h2 class="text-2xl font-bold text-cannabis-800 mb-4">High Times News</h2>
+            <!-- Placeholder for news articles (update with dynamic content as needed) -->
             <div class="space-y-4">
-              <a href="{% url 'log_activity' %}"
-                class="block w-full text-center bg-cannabis-500 hover:bg-cannabis-600 text-white p-3 rounded">
-                Log Activity
-              </a>
-              <a href="{% url 'activity_map' %}"
-                class="block w-full text-center bg-cannabis-400 hover:bg-cannabis-500 text-white p-3 rounded">
-                View Activity Map
-              </a>
+              <!-- Example News Item 1 -->
+              <div class="p-4 border border-cannabis-200 rounded">
+                <a href="https://hightimes.com" target="_blank" class="text-cannabis-800 font-bold hover:underline">
+                  Cannabis Legislation Updates
+                </a>
+                <p class="text-gray-600 text-sm mt-1">Recent developments in cannabis laws might affect your local
+                  community.</p>
+              </div>
+              <!-- Example News Item 2 -->
+              <div class="p-4 border border-cannabis-200 rounded">
+                <a href="https://hightimes.com" target="_blank" class="text-cannabis-800 font-bold hover:underline">
+                  New Strain Releases
+                </a>
+                <p class="text-gray-600 text-sm mt-1">Discover the latest strains hitting the market and what
+                  enthusiasts are saying.</p>
+              </div>
+              <!-- Example News Item 3 -->
+              <div class="p-4 border border-cannabis-200 rounded">
+                <a href="https://hightimes.com" target="_blank" class="text-cannabis-800 font-bold hover:underline">
+                  Industry Innovations
+                </a>
+                <p class="text-gray-600 text-sm mt-1">Tech and innovation are driving the cannabis industry forward in
+                  unexpected ways.</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-
-  <script>
-    function sendFriendRequest() {
-      const username = document.getElementById('friend_username').value;
-      if (username) {
-        window.location.href = `/send_friend_request/${username}/`;
-      }
-    }
-  </script>
 </body>
 
 </html>
