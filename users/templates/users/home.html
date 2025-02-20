@@ -2,23 +2,124 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home</title>
-  <link rel="stylesheet" type="text/css" href="https://bootswatch.com/5/morph/bootstrap.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to Smoke Signal</title>
   {% load static %}
-  <link href="{% static 'output.css' %}" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cannabis: {
+              100: '#e8f5e9',
+              200: '#c8e6c9',
+              300: '#a5d6a7',
+              400: '#81c784',
+              500: '#66bb6a',
+              600: '#4caf50',
+              700: '#43a047',
+              800: '#388e3c',
+              900: '#2e7d32'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Mobile sidebar full width */
+    #mobileSidebar {
+      width: 100%;
+    }
+  </style>
 </head>
 
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-  <div class="bg-white p-8 rounded-lg shadow-lg text-center">
-    <h2 class="text-4xl font-bold mb-6">Welcome to SmokeSignal</h2>
-    <p class="text-lg mb-4">Join our community to share and explore activities.</p>
-    <div>
-      <a href="{% url 'register' %}" class="btn btn-primary mr-2">Register</a>
-      <a href="{% url 'login' %}" class="btn btn-success">Login</a>
+<body class="bg-gradient-to-br from-cannabis-100 to-cannabis-200 min-h-screen relative">
+  <!-- Mobile Sidebar Toggle Button -->
+  <button id="mobileSidebarToggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-cannabis-500 text-white rounded">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+  <!-- Mobile Sidebar Overlay -->
+  <div id="mobileSidebarOverlay" class="fixed inset-0 bg-black/25 z-40 hidden md:hidden"></div>
+  <!-- Mobile Off-Canvas Sidebar -->
+  <div id="mobileSidebar"
+    class="fixed inset-y-0 left-0 w-full md:w-64 bg-white/90 backdrop-blur-sm shadow-lg transform -translate-x-full transition-transform duration-300 md:hidden z-50">
+    <div class="p-4">
+      <h2 class="text-cannabis-800 text-xl font-bold mb-4">Smoke Signal</h2>
+      <nav class="space-y-2">
+        <a href="{% url 'profile' %}"
+          class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
+          <!-- Same SVG logo used on all pages -->
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M5.121 17.804A11.956 11.956 0 0012 20c2.282 0 4.403-.64 6.121-1.735M12 14c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" />
+          </svg>
+          <span>Profile</span>
+        </a>
+        <a href="{% url 'main_feed' %}"
+          class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
+          <span>Activity Feed</span>
+        </a>
+        <a href="{% url 'activity_map' %}"
+          class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
+          <span>Map View</span>
+        </a>
+      </nav>
     </div>
   </div>
+  <!-- Desktop Sidebar -->
+  <div class="hidden md:block fixed inset-y-0 left-0 w-64 bg-white/90 backdrop-blur-sm shadow-lg p-4">
+    <div class="mb-8">
+      <h2 class="text-cannabis-800 text-xl font-bold mb-4">Smoke Signal</h2>
+      <nav class="space-y-2">
+        <a href="{% url 'profile' %}"
+          class="flex items-center space-x-3 p-3 rounded-lg bg-cannabis-200 text-cannabis-800">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M5.121 17.804A11.956 11.956 0 0012 20c2.282 0 4.403-.64 6.121-1.735M12 14c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" />
+          </svg>
+          <span>Profile</span>
+        </a>
+        <a href="{% url 'main_feed' %}"
+          class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
+          <span>Activity Feed</span>
+        </a>
+        <a href="{% url 'activity_map' %}"
+          class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
+          <span>Map View</span>
+        </a>
+      </nav>
+    </div>
+  </div>
+  <!-- Main Content Area (pushed right on desktop) -->
+  <div class="md:ml-64 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-lg text-center">
+      <h2 class="text-4xl font-bold mb-6">Welcome to SmokeSignal</h2>
+      <p class="text-lg mb-4">Join our community to share and explore activities.</p>
+      <div class="space-x-4">
+        <a href="{% url 'register' %}"
+          class="bg-cannabis-500 hover:bg-cannabis-600 text-white font-semibold py-2 px-4 rounded-lg">Register</a>
+        <a href="{% url 'login' %}"
+          class="bg-cannabis-600 hover:bg-cannabis-700 text-white font-semibold py-2 px-4 rounded-lg">Login</a>
+      </div>
+    </div>
+  </div>
+  <script>
+    const mobileSidebarToggle = document.getElementById('mobileSidebarToggle');
+    const mobileSidebar = document.getElementById('mobileSidebar');
+    const mobileOverlay = document.getElementById('mobileSidebarOverlay');
+    function toggleSidebar() {
+      const isOpen = !mobileSidebar.classList.contains('-translate-x-full');
+      mobileSidebar.classList.toggle('-translate-x-full');
+      mobileOverlay.classList.toggle('hidden', isOpen);
+    }
+    mobileSidebarToggle.addEventListener('click', toggleSidebar);
+    mobileOverlay.addEventListener('click', toggleSidebar);
+  </script>
 </body>
 
 </html>
