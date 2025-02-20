@@ -36,63 +36,9 @@
 </head>
 
 <body class="bg-gradient-to-br from-cannabis-100 to-cannabis-200 min-h-screen relative">
-  <!-- Mobile Sidebar Toggle -->
-  <button id="mobileSidebarToggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-cannabis-500 text-white rounded">
-    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-    </svg>
-  </button>
-  <!-- Mobile Off-Canvas Sidebar -->
-  <div id="mobileSidebar"
-    class="fixed inset-0 bg-white/95 backdrop-blur-sm shadow-lg transform -translate-x-full transition-transform duration-300 md:hidden z-50">
-    <div class="p-4">
-      <h2 class="text-cannabis-800 text-xl font-bold mb-4">Smoke Signal</h2>
-      <nav class="space-y-2">
-        <a href="{% url 'profile' %}"
-          class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M5.121 17.804A11.956 11.956 0 0012 20c2.282 0 4.403-.64 6.121-1.735M12 14c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" />
-          </svg>
-          <span>Profile</span>
-        </a>
-        <a href="{% url 'main_feed' %}"
-          class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
-          <span>Activity Feed</span>
-        </a>
-        <a href="{% url 'activity_map' %}"
-          class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
-          <span>Map View</span>
-        </a>
-      </nav>
-    </div>
-  </div>
-  <!-- Desktop Sidebar -->
-  <div class="hidden md:block fixed inset-y-0 left-0 w-64 bg-white/90 backdrop-blur-sm shadow-lg p-4">
-    <div class="mb-8">
-      <h2 class="text-cannabis-800 text-xl font-bold mb-4">Smoke Signal</h2>
-      <nav class="space-y-2">
-        <a href="{% url 'profile' %}"
-          class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M5.121 17.804A11.956 11.956 0 0012 20c2.282 0 4.403-.64 6.121-1.735M12 14c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" />
-          </svg>
-          <span>Profile</span>
-        </a>
-        <a href="{% url 'main_feed' %}"
-          class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
-          <span>Activity Feed</span>
-        </a>
-        <a href="{% url 'activity_map' %}"
-          class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
-          <span>Map View</span>
-        </a>
-      </nav>
-    </div>
-  </div>
+
   <!-- Main Content Area -->
-  <div class="md:ml-64 flex items-center justify-center min-h-screen">
+  <div class="flex items-center justify-center min-h-screen">
     <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
       <h2 class="text-3xl font-bold mb-6 text-center">Login</h2>
       <form method="post" class="space-y-4">
