@@ -28,16 +28,96 @@
       }
     }
   </script>
+  <style>
+    #map {
+      height: 80vh;
+      width: 100%;
+      border-radius: 0.5rem;
+    }
+
+    .activity-popup {
+      max-width: 300px;
+    }
+
+    .time-badge {
+      padding: 4px 8px;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      margin-top: 4px;
+    }
+
+    /* Add these new rules */
+    #mobileSidebar {
+      width: 85%;
+      max-width: 320px;
+    }
+
+    @media (min-width: 768px) {
+      #mobileSidebar {
+        width: 16rem;
+        transform: none;
+      }
+    }
+
+    #mobileSidebarOverlay {
+      transition: opacity 0.3s;
+    }
+
+    /* Existing rules continue */
+    .recent {
+      background-color: #22c55e;
+      color: white;
+    }
+
+    .hour {
+      background-color: #eab308;
+      color: white;
+    }
+
+    .old {
+      background-color: #ef4444;
+      color: white;
+    }
+  </style>
 </head>
 
 <body class="bg-gradient-to-br from-cannabis-100 to-cannabis-200 min-h-screen">
+  <!-- Mobile Toggle -->
+  <button id="mobileSidebarToggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-cannabis-500 text-white rounded">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+
+  <!-- Layout Container -->
   <div class="flex">
-    <!-- Persistent Navigation Sidebar -->
-    <div class="w-64 bg-white/90 backdrop-blur-sm min-h-screen p-4 shadow-lg">
+    <!-- Mobile Sidebar -->
+    <div id="mobileSidebar"
+      class="fixed inset-y-0 left-0 w-64 bg-white/90 backdrop-blur-sm shadow-lg transform -translate-x-full transition-transform duration-300 md:hidden z-50">
+      <div class="p-4">
+        <h2 class="text-cannabis-800 text-xl font-bold mb-4">Smoke Signal</h2>
+        <nav class="space-y-2">
+          <a href="{% url 'profile' %}"
+            class="flex items-center space-x-3 p-3 rounded-lg bg-cannabis-200 text-cannabis-800">
+            <span>Profile</span>
+          </a>
+          <a href="{% url 'main_feed' %}"
+            class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
+            <span>Activity Feed</span>
+          </a>
+          <a href="{% url 'activity_map' %}"
+            class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
+            <span>Map View</span>
+          </a>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Desktop Sidebar -->
+    <div class="hidden md:block w-64 bg-white/90 backdrop-blur-sm min-h-screen p-4 shadow-lg flex-shrink-0">
       <div class="mb-8">
-        <h2 class="text-cannabis-800 text-xl font-bold mb-4">Smoke Singal</h2>
-        <div class="space-y-2">
-          <!-- Profile -->
+        <h2 class="text-cannabis-800 text-xl font-bold mb-4">Smoke Signal</h2>
+        <nav class="space-y-2">
           <a href="{% url 'profile' %}"
             class="flex items-center space-x-3 p-3 rounded-lg bg-cannabis-200 text-cannabis-800">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -47,7 +127,6 @@
             </svg>
             <span>Profile</span>
           </a>
-          <!-- Feed -->
           <a href="{% url 'main_feed' %}"
             class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,7 +136,6 @@
             </svg>
             <span>Activity Feed</span>
           </a>
-          <!-- Map View -->
           <a href="{% url 'activity_map' %}"
             class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -67,7 +145,6 @@
             </svg>
             <span>Map View</span>
           </a>
-          <!-- Friends -->
           <a href="#" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -76,7 +153,6 @@
             </svg>
             <span>Friends</span>
           </a>
-          <!-- Favorite Spots -->
           <a href="#" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -85,7 +161,6 @@
             </svg>
             <span>Favorite Spots</span>
           </a>
-          <!-- Strain Library -->
           <a href="#" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -94,87 +169,89 @@
             </svg>
             <span>Strain Library</span>
           </a>
-        </div>
+        </nav>
       </div>
     </div>
 
-    <!-- Main Content Area -->
-    <div class="flex-1 p-6">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Profile Sidebar: Friends, Friend Requests, and Add Friend -->
-        <div class="md:col-span-1">
-          <div class="bg-white/90 backdrop-blur-sm p-6 rounded-lg shadow-lg">
-            <!-- Your Friends -->
-            <h3 class="text-lg font-semibold text-cannabis-800 mb-4">Your Friends</h3>
-            <ul class="space-y-2 mb-6">
-              {% for friend in friends %}
-              <li class="p-2 border border-cannabis-200 rounded">
-                <a href="{% url 'view_profile' friend.username %}" class="text-cannabis-600 hover:underline">
-                  {{ friend.username }}
-                </a>
-              </li>
-              {% empty %}
-              <li class="text-gray-500">You have no friends yet.</li>
-              {% endfor %}
-            </ul>
+    <!-- Main Content -->
+    <div class="flex-1 p-8">
+      <div class="max-w-4xl mx-auto bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Profile Sidebar: Friends, Friend Requests, and Add Friend -->
+          <div class="md:col-span-1">
+            <div class="bg-white/90 backdrop-blur-sm p-6 rounded-lg shadow-lg">
+              <!-- Your Friends -->
+              <h3 class="text-lg font-semibold text-cannabis-800 mb-4">Your Friends</h3>
+              <ul class="space-y-2 mb-6">
+                {% for friend in friends %}
+                <li class="p-2 border border-cannabis-200 rounded">
+                  <a href="{% url 'view_profile' friend.username %}" class="text-cannabis-600 hover:underline">
+                    {{ friend.username }}
+                  </a>
+                </li>
+                {% empty %}
+                <li class="text-gray-500">You have no friends yet.</li>
+                {% endfor %}
+              </ul>
 
-            <!-- Friend Requests -->
-            <h3 class="text-lg font-semibold text-cannabis-800 mb-4">Friend Requests</h3>
-            <ul class="space-y-2 mb-6">
-              {% for request in received_requests %}
-              <li class="flex justify-between items-center p-2 border border-cannabis-200 rounded">
-                <span>{{ request.from_user.username }}</span>
-                <a href="{% url 'accept_friend_request' request.id %}"
-                  class="bg-cannabis-500 hover:bg-cannabis-600 text-white text-sm px-3 py-1 rounded">
-                  Accept
-                </a>
-              </li>
-              {% empty %}
-              <li class="text-gray-500">No friend requests.</li>
-              {% endfor %}
-            </ul>
+              <!-- Friend Requests -->
+              <h3 class="text-lg font-semibold text-cannabis-800 mb-4">Friend Requests</h3>
+              <ul class="space-y-2 mb-6">
+                {% for request in received_requests %}
+                <li class="flex justify-between items-center p-2 border border-cannabis-200 rounded">
+                  <span>{{ request.from_user.username }}</span>
+                  <a href="{% url 'accept_friend_request' request.id %}"
+                    class="bg-cannabis-500 hover:bg-cannabis-600 text-white text-sm px-3 py-1 rounded">
+                    Accept
+                  </a>
+                </li>
+                {% empty %}
+                <li class="text-gray-500">No friend requests.</li>
+                {% endfor %}
+              </ul>
 
-            <!-- Add a Friend -->
-            <h3 class="text-lg font-semibold text-cannabis-800 mb-4">Add a Friend</h3>
-            <form method="post" class="space-y-4">
-              {% csrf_token %}
-              <input type="text" id="friend_username" name="username" placeholder="Enter username"
-                class="w-full p-2 border border-cannabis-200 rounded focus:outline-none focus:border-cannabis-500">
-              <button type="button" onclick="sendFriendRequest()"
-                class="w-full bg-cannabis-500 hover:bg-cannabis-600 text-white p-2 rounded">
-                Send Friend Request
-              </button>
-            </form>
+              <!-- Add a Friend -->
+              <h3 class="text-lg font-semibold text-cannabis-800 mb-4">Add a Friend</h3>
+              <form method="post" class="space-y-4">
+                {% csrf_token %}
+                <input type="text" id="friend_username" name="username" placeholder="Enter username"
+                  class="w-full p-2 border border-cannabis-200 rounded focus:outline-none focus:border-cannabis-500">
+                <button type="button" onclick="sendFriendRequest()"
+                  class="w-full bg-cannabis-500 hover:bg-cannabis-600 text-white p-2 rounded">
+                  Send Friend Request
+                </button>
+              </form>
+            </div>
           </div>
-        </div>
 
-        <!-- Main Profile Content: Logged Activities -->
-        <div class="md:col-span-2">
-          <div class="bg-white/90 backdrop-blur-sm p-6 rounded-lg shadow-lg">
-            <h3 class="text-lg font-semibold text-cannabis-800 mb-4">Logged Activities</h3>
-            <ul class="space-y-4 mb-6 max-h-96 overflow-y-auto">
-              {% for activity in activities %}
-              <li class="p-4 border border-cannabis-200 rounded">
-                <strong class="text-cannabis-700">{{ activity.strain_name }} ({{ activity.strain_type }})</strong>
-                <ul class="mt-2 ml-4 list-disc text-gray-700">
-                  <li>Rating: {{ activity.rating }}</li>
-                  <li>Location: {{ activity.location }}</li>
-                  <li>Notes: {{ activity.notes }}</li>
-                  <li>Timestamp: {{ activity.timestamp }}</li>
-                </ul>
-              </li>
-              {% endfor %}
-            </ul>
+          <!-- Main Profile Content: Logged Activities -->
+          <div class="md:col-span-2">
+            <div class="bg-white/90 backdrop-blur-sm p-6 rounded-lg shadow-lg">
+              <h3 class="text-lg font-semibold text-cannabis-800 mb-4">Logged Activities</h3>
+              <ul class="space-y-4 mb-6 max-h-96 overflow-y-auto">
+                {% for activity in activities %}
+                <li class="p-4 border border-cannabis-200 rounded">
+                  <strong class="text-cannabis-700">{{ activity.strain_name }} ({{ activity.strain_type }})</strong>
+                  <ul class="mt-2 ml-4 list-disc text-gray-700">
+                    <li>Rating: {{ activity.rating }}</li>
+                    <li>Location: {{ activity.location }}</li>
+                    <li>Notes: {{ activity.notes }}</li>
+                    <li>Timestamp: {{ activity.timestamp }}</li>
+                  </ul>
+                </li>
+                {% endfor %}
+              </ul>
 
-            <div class="space-y-4">
-              <a href="{% url 'log_activity' %}"
-                class="block w-full text-center bg-cannabis-500 hover:bg-cannabis-600 text-white p-3 rounded">
-                Log Activity
-              </a>
-              <a href="{% url 'activity_map' %}"
-                class="block w-full text-center bg-cannabis-400 hover:bg-cannabis-500 text-white p-3 rounded">
-                View Activity Map
-              </a>
+              <div class="space-y-4">
+                <a href="{% url 'log_activity' %}"
+                  class="block w-full text-center bg-cannabis-500 hover:bg-cannabis-600 text-white p-3 rounded">
+                  Log Activity
+                </a>
+                <a href="{% url 'activity_map' %}"
+                  class="block w-full text-center bg-cannabis-400 hover:bg-cannabis-500 text-white p-3 rounded">
+                  View Activity Map
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -182,6 +259,10 @@
     </div>
   </div>
 
+  <!-- Overlay -->
+  <div id="mobileSidebarOverlay" class="fixed inset-0 bg-black/25 z-40 hidden md:hidden"></div>
+
+  <!-- Common JavaScript -->
   <script>
     function sendFriendRequest() {
       const username = document.getElementById('friend_username').value;
@@ -189,6 +270,24 @@
         window.location.href = `/send_friend_request/${username}/`;
       }
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const mobileSidebarToggle = document.getElementById('mobileSidebarToggle');
+      const mobileSidebar = document.getElementById('mobileSidebar');
+      const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
+
+      if (mobileSidebarToggle && mobileSidebar && mobileSidebarOverlay) {
+        mobileSidebarToggle.addEventListener('click', () => {
+          mobileSidebar.classList.toggle('-translate-x-full');
+          mobileSidebarOverlay.classList.toggle('hidden');
+        });
+
+        mobileSidebarOverlay.addEventListener('click', () => {
+          mobileSidebar.classList.add('-translate-x-full');
+          mobileSidebarOverlay.classList.add('hidden');
+        });
+      }
+    });
   </script>
 </body>
 

@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Smoke Signal - Activity Feed</title>
+  {% load static %}
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -27,16 +28,75 @@
       }
     }
   </script>
+  <style>
+    #map {
+      height: 80vh;
+      width: 100%;
+      border-radius: 0.5rem;
+    }
+
+    .activity-popup {
+      max-width: 300px;
+    }
+
+    .time-badge {
+      padding: 4px 8px;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      margin-top: 4px;
+    }
+
+    /* Add these new rules */
+    #mobileSidebar {
+      width: 85%;
+      max-width: 320px;
+    }
+
+    @media (min-width: 768px) {
+      #mobileSidebar {
+        width: 16rem;
+        transform: none;
+      }
+    }
+
+    #mobileSidebarOverlay {
+      transition: opacity 0.3s;
+    }
+
+    /* Existing rules continue */
+    .recent {
+      background-color: #22c55e;
+      color: white;
+    }
+
+    .hour {
+      background-color: #eab308;
+      color: white;
+    }
+
+    .old {
+      background-color: #ef4444;
+      color: white;
+    }
+  </style>
 </head>
 
 <body class="bg-gradient-to-br from-cannabis-100 to-cannabis-200 min-h-screen">
+  <!-- Mobile Toggle -->
+  <button id="mobileSidebarToggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-cannabis-500 text-white rounded">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+
+  <!-- Layout Container -->
   <div class="flex">
-    <!-- Persistent Sidebar -->
-    <div class="w-64 bg-white/90 backdrop-blur-sm min-h-screen p-4 shadow-lg">
-      <div class="mb-8">
+    <!-- Mobile Sidebar -->
+    <div id="mobileSidebar"
+      class="fixed inset-y-0 left-0 w-64 bg-white/90 backdrop-blur-sm shadow-lg transform -translate-x-full transition-transform duration-300 md:hidden z-50">
+      <div class="p-4">
         <h2 class="text-cannabis-800 text-xl font-bold mb-4">Smoke Signal</h2>
-        <div class="space-y-2">
-          <!-- Profile Section -->
+        <nav class="space-y-2">
           <a href="{% url 'profile' %}"
             class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,64 +106,50 @@
             </svg>
             <span>Profile</span>
           </a>
-          <!-- Activity Feed -->
           <a href="{% url 'main_feed' %}"
             class="flex items-center space-x-3 p-3 rounded-lg bg-cannabis-200 text-cannabis-800">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2">
-              </path>
-            </svg>
             <span>Activity Feed</span>
           </a>
-          <!-- Map View -->
           <a href="{% url 'activity_map' %}"
             class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M9 20l-5.447-2.724A2 2 0 013 15.382V6.618a2 2 0 011.553-1.894L9 3l6-1.5 5.447 2.724A2 2 0 0121 6.618v8.764a2 2 0 01-1.553 1.894L15 19l-6 1.5z">
-              </path>
-            </svg>
             <span>Map View</span>
           </a>
-          <!-- Friends -->
-          <a href="#" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
-              </path>
-            </svg>
-            <span>Friends</span>
-          </a>
-          <!-- Favorite Spots -->
-          <a href="#" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z">
-              </path>
-            </svg>
-            <span>Favorite Spots</span>
-          </a>
-          <!-- Strain Library -->
-          <a href="#" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
-              </path>
-            </svg>
-            <span>Strain Library</span>
-          </a>
-        </div>
+        </nav>
       </div>
     </div>
 
-    <!-- Main Content Area: Activity Feed and News Section -->
+    <!-- Desktop Sidebar -->
+    <div class="hidden md:block w-64 bg-white/90 backdrop-blur-sm min-h-screen p-4 shadow-lg flex-shrink-0">
+      <div class="mb-8">
+        <h2 class="text-cannabis-800 text-xl font-bold mb-4">Smoke Signal</h2>
+        <nav class="space-y-2">
+          <a href="{% url 'profile' %}"
+            class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M5.121 17.804A11.956 11.956 0 0012 20c2.282 0 4.403-.64 6.121-1.735M12 14c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z">
+              </path>
+            </svg>
+            <span>Profile</span>
+          </a>
+          <a href="{% url 'main_feed' %}"
+            class="flex items-center space-x-3 p-3 rounded-lg bg-cannabis-200 text-cannabis-800">
+            <span>Activity Feed</span>
+          </a>
+          <a href="{% url 'activity_map' %}"
+            class="flex items-center space-x-3 p-3 rounded-lg hover:bg-cannabis-100 text-cannabis-800">
+            <span>Map View</span>
+          </a>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Main Content -->
     <div class="flex-1 p-8">
       <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Activity Feed Column (2/3 of width) -->
         <div class="md:col-span-2">
           <div class="bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl p-6">
-            <!-- Header -->
             <div class="flex items-center justify-between mb-6">
               <h1 class="text-2xl font-bold text-cannabis-800">Activity Feed</h1>
               <a href="{% url 'log_activity' %}"
@@ -111,20 +157,16 @@
                 Log Activity
               </a>
             </div>
-            <!-- Feed -->
             <div class="space-y-4">
               {% for activity in activities %}
               <div
                 class="p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow border border-cannabis-200">
                 <p class="text-sm font-semibold text-cannabis-800">
-                  {{ activity.user.username }}
-                  <span class="text-cannabis-600">• {{ activity.location }}</span>
+                  {{ activity.user.username }} <span class="text-cannabis-600">• {{ activity.location }}</span>
                 </p>
                 <p class="text-gray-700 mt-2">{{ activity.notes }}</p>
                 <div class="flex items-center justify-between text-xs mt-3 text-cannabis-600">
-                  <span class="flex items-center">
-                    🌿 {{ activity.strain_name }}
-                  </span>
+                  <span class="flex items-center">🌿 {{ activity.strain_name }}</span>
                   <span>{{ activity.timestamp|timesince }} ago</span>
                 </div>
               </div>
@@ -132,14 +174,12 @@
             </div>
           </div>
         </div>
-
         <!-- News Section Column (1/3 of width) -->
         <div class="md:col-span-1">
           <div class="bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl p-6">
             <h2 class="text-2xl font-bold text-cannabis-800 mb-4">High Times News</h2>
-            <!-- Placeholder for news articles (update with dynamic content as needed) -->
             <div class="space-y-4">
-              <!-- Example News Item 1 -->
+              <!-- Example News Items -->
               <div class="p-4 border border-cannabis-200 rounded">
                 <a href="https://hightimes.com" target="_blank" class="text-cannabis-800 font-bold hover:underline">
                   Cannabis Legislation Updates
@@ -147,15 +187,14 @@
                 <p class="text-gray-600 text-sm mt-1">Recent developments in cannabis laws might affect your local
                   community.</p>
               </div>
-              <!-- Example News Item 2 -->
               <div class="p-4 border border-cannabis-200 rounded">
                 <a href="https://hightimes.com" target="_blank" class="text-cannabis-800 font-bold hover:underline">
                   New Strain Releases
                 </a>
                 <p class="text-gray-600 text-sm mt-1">Discover the latest strains hitting the market and what
-                  enthusiasts are saying.</p>
+                  enthusiasts
+                  are saying.</p>
               </div>
-              <!-- Example News Item 3 -->
               <div class="p-4 border border-cannabis-200 rounded">
                 <a href="https://hightimes.com" target="_blank" class="text-cannabis-800 font-bold hover:underline">
                   Industry Innovations
@@ -169,6 +208,30 @@
       </div>
     </div>
   </div>
+
+  <!-- Overlay -->
+  <div id="mobileSidebarOverlay" class="fixed inset-0 bg-black/25 z-40 hidden md:hidden"></div>
+
+  <!-- Common JavaScript -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const mobileSidebarToggle = document.getElementById('mobileSidebarToggle');
+      const mobileSidebar = document.getElementById('mobileSidebar');
+      const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
+
+      if (mobileSidebarToggle && mobileSidebar && mobileSidebarOverlay) {
+        mobileSidebarToggle.addEventListener('click', () => {
+          mobileSidebar.classList.toggle('-translate-x-full');
+          mobileSidebarOverlay.classList.toggle('hidden');
+        });
+
+        mobileSidebarOverlay.addEventListener('click', () => {
+          mobileSidebar.classList.add('-translate-x-full');
+          mobileSidebarOverlay.classList.add('hidden');
+        });
+      }
+    });
+  </script>
 </body>
 
 </html>
