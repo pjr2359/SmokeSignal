@@ -16,5 +16,5 @@ os.system(f"cd {PROJECT_DIR} && python manage.py collectstatic --noinput")
 # Run migrations (if using Django)
 os.system(f"cd {PROJECT_DIR} && python manage.py migrate")
 
-# Restart the PythonAnywhere web app
+# Restart the PythonAnywhere app
 os.system("touch /var/www/pjr99_pythonanywhere_com_wsgi.py")
